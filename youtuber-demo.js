@@ -48,6 +48,7 @@ app.get('/youtubers/:id',function(req,res){
         res.json(youtuber)
     }
 })
+
 app.use(express.json()) // http 외 모듈인 '미들웨어' : json 설정
 app.post('/youtubers',(req,res)=>{
    console.log(req.body)
@@ -57,6 +58,7 @@ app.post('/youtubers',(req,res)=>{
     message : `${db.get(id - 1).Title}님, 유튜버 등록을 축하드립니다`
    })
 })
+
 app.delete('/youtubers/:id',(req,res)=>{
     let {id} = req.params
     id = parseInt(id)
@@ -73,6 +75,7 @@ app.delete('/youtubers/:id',(req,res)=>{
         })
     }
 })
+
 app.delete("/youtubers",function(req,res){
     
     var msg = ""
@@ -87,6 +90,7 @@ app.delete("/youtubers",function(req,res){
         message : msg
     })
 })
+
 app.put("/youtubers/:id", (req,res)=>{
     let {id} = req.params
     id = parseInt(id)
