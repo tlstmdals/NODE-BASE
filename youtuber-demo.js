@@ -28,10 +28,20 @@ db.set(id++,youtuber3)
 app.get("/youtubers",function(req,res){
 
     var youtubers = {}
-    db.forEach(function(value,key){
+
+    console.log(db)
+    if(db.size !== 0){
+            db.forEach(function(value,key){
         youtubers[key] = value
-    })
+        }); 
     res.json((youtubers))
+    } else {
+        res.status(404).json({
+            msg : "조회할 유튜버가 없습니다"
+        })
+    }
+
+   
 })
 
 app.get('/youtubers/:id',function(req,res){
@@ -51,44 +61,52 @@ app.get('/youtubers/:id',function(req,res){
 
 app.use(express.json()) // http 외 모듈인 '미들웨어' : json 설정
 app.post('/youtubers',(req,res)=>{
-   console.log(req.body)
-   // Map(db)에 저장(set) 해주어야 한다
-   db.set(id++, req.body)
-   res.json({
-    message : `${db.get(id - 1).Title}님, 유튜버 등록을 축하드립니다`
-   })
+    const Title = req.body.Title
+    if(Title){
+        // Map(db)에 저장(set) 해주어야 한다
+        db.set(id++, req.body)
+        res.json({
+            message : `${db.get(id - 1).Title}님, 유튜버 등록을 축하드립니다`
+        })
+    }else{
+        res.status(400).json({
+            msg : "요청값을 제대로 보내주세요."
+        })
+    }
 })
 
 app.delete('/youtubers/:id',(req,res)=>{
     let {id} = req.params
     id = parseInt(id)
     var youtuber = db.get(id)
-    if(youtuber === undefined){
-        res.json({
-            msg : `${id}번 유튜버는 가입된 유튜버가 아닙니다`
-        })
-    } else {
+    if(youtuber) {
         const name = youtuber.Title
         db.delete(id)    
         res.json({
             msg : `${name}님이 탈퇴하였습니다`
         })
     }
+    else{
+        res.json({
+            msg : `${id}번 유튜버는 가입된 유튜버가 아닙니다`
+        })
+    }
 })
 
 app.delete("/youtubers",function(req,res){
-    
-    var msg = ""
 
     if(db.size >= 1){
         db.clear()
-            msg ="전체 유튜버가 삭제되었습니다"
+        res.json({
+            message : "전체 유튜버가 삭제되었습니다"
+        })
+         
     } else {
-            msg = "삭제할 유튜버가 없습니다"
+        res.status(404).json({
+            message : "삭제할 유튜버가 없습니다"
+        })
+           
     }
-    res.json({
-        message : msg
-    })
 })
 
 app.put("/youtubers/:id", (req,res)=>{
@@ -96,7 +114,7 @@ app.put("/youtubers/:id", (req,res)=>{
     id = parseInt(id)
     var youtuber = db.get(id)
     if(youtuber === undefined){
-        res.json({
+        res.status(404).json({
             msg : `요청하신 ${id}번은 없는 유튜버입니다`
         })
     } else{
